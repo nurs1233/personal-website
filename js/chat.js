@@ -324,6 +324,7 @@ function sendMessage() {
       chatSending = false
       showTyping(false)
     })
+}
 const GEOPOLITICS_KNOWLEDGE = {
   "hegemoni": "Kekuatan global saat ini terfragmentasi dalam persaingan hegemoni kutub ganda/multipolar antara AS, Tiongkok, dan kekuatan regional.",
   "poros maritim": "Indonesia berada pada posisi geopolitik silang yang sangat strategis secara maritim (Alur Laut Kepulauan Indonesia / ALKI) yang menghubungkan dua samudra.",
