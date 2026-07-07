@@ -315,9 +315,6 @@ async function getIgnisResponse(userMsg) {
   }
   lastApiCall = Date.now()
 
-  const apiKey = window.OPENROUTER_API_KEY
-  if (!apiKey) throw new Error('API key not configured')
-
   const memories = loadMemories()
   const mood = (typeof dragonMood !== 'undefined') ? dragonMood : 'normal'
   const energy = Math.round((typeof interactionScore !== 'undefined') ? interactionScore : 10)
@@ -360,29 +357,19 @@ Aturan:
     content: m.content
   }))
 
-  const body = {
-    model: OPENROUTER_MODEL,
-    messages: [
-      { role: 'system', content: sysPrompt },
-      ...historyMsgs,
-      { role: 'user', content: userMsg }
-    ],
-    temperature: 0.85,
-    max_tokens: 120
-  }
-
-  const res = await fetch(API_URL, {
+  const res = await fetch('/api/chat', {
     method: 'POST',
-    headers: { 
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`
-    },
-    body: JSON.stringify(body)
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      message: userMsg,
+      historyMsgs,
+      sysPrompt
+    })
   })
 
   if (!res.ok) {
     const errText = await res.text()
-    console.warn('OpenRouter API error:', res.status, errText)
+    console.warn('API error:', res.status, errText)
     if (res.status === 429) {
       await new Promise(r => setTimeout(r, 3000))
       return retryWithFallback(userMsg)
@@ -391,7 +378,7 @@ Aturan:
   }
 
   const data = await res.json()
-  const reply = data?.choices?.[0]?.message?.content
+  const reply = data?.reply
   if (!reply) throw new Error('Empty response')
 
   extractMemory(userMsg)
