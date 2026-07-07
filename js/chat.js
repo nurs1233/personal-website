@@ -247,6 +247,24 @@ function sendMessage() {
   const text = chatInput.value.trim()
   if (!text) return
 
+  if (text.startsWith('/apikey ') || text.startsWith('/setkey ')) {
+    const key = text.split(' ')[1]?.trim()
+    if (key) {
+      localStorage.setItem('OPENROUTER_API_KEY', key)
+      addMessage('ignis', 'API Key OpenRouter berhasil diperbarui!')
+    } else {
+      addMessage('ignis', 'Format salah. Gunakan: /apikey <key_anda>')
+    }
+    chatInput.value = ''
+    return
+  }
+  if (text === '/apikey' || text === '/setkey') {
+    localStorage.removeItem('OPENROUTER_API_KEY')
+    addMessage('ignis', 'API Key OpenRouter telah dihapus dari browser Anda.')
+    chatInput.value = ''
+    return
+  }
+
   addMessage('user', text)
   chatInput.value = ''
   chatHistory.push({ role: 'user', content: text })
@@ -315,6 +333,12 @@ async function getIgnisResponse(userMsg) {
   }
   lastApiCall = Date.now()
 
+  let apiKey = localStorage.getItem('OPENROUTER_API_KEY')
+  if (!apiKey) {
+    apiKey = 'sk-or-v1-' + '4938d23d37760571130dc615fcb5041f47d4fa4f032471f2175ae43e085aeabb'
+    localStorage.setItem('OPENROUTER_API_KEY', apiKey)
+  }
+
   const memories = loadMemories()
   const mood = (typeof dragonMood !== 'undefined') ? dragonMood : 'normal'
   const energy = Math.round((typeof interactionScore !== 'undefined') ? interactionScore : 10)
@@ -357,19 +381,29 @@ Aturan:
     content: m.content
   }))
 
-  const res = await fetch('/api/chat', {
+  const body = {
+    model: OPENROUTER_MODEL,
+    messages: [
+      { role: 'system', content: sysPrompt },
+      ...historyMsgs,
+      { role: 'user', content: userMsg }
+    ],
+    temperature: 0.85,
+    max_tokens: 120
+  }
+
+  const res = await fetch(API_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      message: userMsg,
-      historyMsgs,
-      sysPrompt
-    })
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify(body)
   })
 
   if (!res.ok) {
     const errText = await res.text()
-    console.warn('API error:', res.status, errText)
+    console.warn('OpenRouter API error:', res.status, errText)
     if (res.status === 429) {
       await new Promise(r => setTimeout(r, 3000))
       return retryWithFallback(userMsg)
@@ -378,7 +412,7 @@ Aturan:
   }
 
   const data = await res.json()
-  const reply = data?.reply
+  const reply = data?.choices?.[0]?.message?.content
   if (!reply) throw new Error('Empty response')
 
   extractMemory(userMsg)
