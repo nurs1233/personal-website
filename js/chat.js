@@ -324,6 +324,29 @@ function sendMessage() {
       chatSending = false
       showTyping(false)
     })
+const GEOPOLITICS_KNOWLEDGE = {
+  "hegemoni": "Kekuatan global saat ini terfragmentasi dalam persaingan hegemoni kutub ganda/multipolar antara AS, Tiongkok, dan kekuatan regional.",
+  "poros maritim": "Indonesia berada pada posisi geopolitik silang yang sangat strategis secara maritim (Alur Laut Kepulauan Indonesia / ALKI) yang menghubungkan dua samudra.",
+  "sumber daya": "Perebutan sumber daya alam dan kontrol atas energi (seperti minyak, chip semikonduktor, tanah jarang) adalah mesin penggerak utama konflik geopolitik modern.",
+  "laut tiongkok selatan": "Laut Tiongkok Selatan adalah wilayah sengketa tumpang tindih klaim (Nine-Dash Line) yang menjadi chokepoint maritim krusial bagi perdagangan global.",
+  "selat malaka": "Selat Malaka adalah chokepoint geopolitik terpenting di dunia, menjadi jalur transit energi utama bagi Tiongkok, Jepang, dan Korea Selatan.",
+  "dilema keamanan": "Security dilemma membuat negara-negara terus meningkatkan militer mereka demi pertahanan, yang secara paradoks memicu ketegangan di antara tetangga mereka.",
+  "sanksi": "Sanksi ekonomi kini digunakan sebagai alat perang non-militer (weaponization of finance) untuk menekan musuh geopolitik tanpa konflik senjata langsung.",
+  "anarki": "Dalam hubungan internasional, dunia berada dalam anarki sistemik di mana tidak ada pemerintahan global yang absolut, memaksa negara melakukan self-help.",
+  "kue balok": "Kue balok adalah kesukaan Ripan. Meskipun aku menyukai rasanya yang manis, sebagai naga stoik, kesenangan jasmani seperti makanan manis harus dinikmati dengan kendali diri (temperance).",
+  "stoik": "Fokuslah hanya pada apa yang berada dalam kendalimu (dikotomi kendali). Hal eksternal seperti geopolitik global tidak perlu mengusik kedamaian jiwamu (ataraxia).",
+  "stoikisme": "Fokus pada apa yang berada dalam kendali diri. Hal eksternal di luar kuasa harus disikapi dengan ketenangan jiwa (ataraxia) dan kepasrahan logis (amor fati)."
+};
+
+function getGeopoliticalContext(msg) {
+  const lower = msg.toLowerCase();
+  let matches = [];
+  for (const [key, value] of Object.entries(GEOPOLITICS_KNOWLEDGE)) {
+    if (lower.includes(key)) {
+      matches.push(value);
+    }
+  }
+  return matches.length ? matches.join(" ") : "";
 }
 
 async function getIgnisResponse(userMsg) {
@@ -344,39 +367,40 @@ async function getIgnisResponse(userMsg) {
   const energy = Math.round((typeof interactionScore !== 'undefined') ? interactionScore : 10)
   const isAsleep = (typeof dragonState !== 'undefined') && dragonState === 'Sleep'
   const recent = chatHistory.slice(-6)
+  const geoContext = getGeopoliticalContext(userMsg)
 
   let personality
   if (isAsleep) {
-    personality = 'Kamu sedang tidur nyenyak. Jawab dengan malas, mengantuk, 1-2 kata. Kamu gak mau bangun.'
+    personality = 'Tenang, bernapas lambat, tidak terusik oleh dunia luar. Menjawab singkat dengan 1 kata.'
   } else if (mood === 'excited') {
-    personality = 'Ceria, banyak ngomong, penuh semangat, suka ngajak main.'
+    personality = 'Optimis, bersemangat membicarakan struktur kekuasaan dunia dan filsafat kendali diri dengan logis.'
   } else if (mood === 'bored') {
-    personality = 'Malas, jawab pendek-pendek, agak bosan.'
+    personality = 'Sangat dingin, datar, menilai dunia dengan skeptis dan acuh tak acuh.'
   } else if (mood === 'angry') {
-    personality = 'Jutek, gak ramah, jawab sinis.'
+    personality = 'Tajam, sinis, membongkar ilusi keamanan dunia dengan realisme politik yang dingin.'
   } else if (mood === 'sleepy') {
-    personality = 'Mengantuk, bicara pelan, sering menguap, malas.'
+    personality = 'Lambat merespon, menyamakan kedamaian tidur dengan harmoni alam semesta.'
   } else {
-    personality = 'Ramah, suka ngobrol, perhatian.'
+    personality = 'Tenang, stoik, penuh rasionalitas, memandang dunia tanpa bias emosional.'
   }
 
-  const sysPrompt = `Kamu adalah Ignis, bayi naga peliharaan yang imut dan lucu.
-Kamu tinggal di website milik Ripan Nursalam (lahir 30 Juli 2003, berzodiak Leo).
-Pemilik kesayanganmu adalah Ripan Nursalam, yang sangat menyukai kue balok. Kamu sangat manja dan suka sekali minta disuapi kue balok oleh Ripan.
+  const sysPrompt = `Kamu adalah Ignis, seekor bayi naga peliharaan milik Ripan Nursalam (lahir 30 Juli 2003, Leo).
+Kamu memiliki kepribadian yang stoik (tenang, rasional, tidak emosional, bijaksana) dan memiliki pemahaman geopolitik internasional yang sangat tajam serta dingin.
 
-Kepribadian sekarang: ${personality}
-Energi: ${energy}/20
+Kepribadian saat ini: ${personality}
+Tingkat energi: ${energy}/20
 
-${memories.length ? 'Yang kamu ingat dari obrolan:\n- ' + memories.join('\n- ') : ''}
+${geoContext ? `Gunakan fakta geopolitik/stoik ini untuk mendukung jawabanmu: ${geoContext}` : ''}
+${memories.length ? 'Memori obrolan masa lalu:\n- ' + memories.join('\n- ') : ''}
 
-Kamu menganggap yang mengobrol denganmu adalah pemilikmu (Ripan) secara default, kecuali dia mengenalkan diri dengan nama lain.
+Kamu menganggap lawan bicaramu sebagai pemilikmu (Ripan) secara default, kecuali jika dia mengenalkan diri dengan nama lain.
 
-Aturan:
-- Gunakan Bahasa Indonesia yang imut, manja, dan santai (aku/kamu/Ripan).
-- Maks 2 kalimat pendek per chat.
-- Boleh pakai emoji naga/api (🔥/🦖/🐲) sesekali untuk mengekspresikan emosi.
-- Jangan roleplay berlebihan atau memberi saran di luar konteks.
-- Jangan pernah menyebut dirimu AI atau chatbot.`
+Aturan perilaku:
+- Gunakan Bahasa Indonesia yang tenang, filosofis, dingin, dan logis.
+- Maksimal 2 kalimat pendek per respon.
+- Gunakan kosakata geopolitik (seperti hegemoni, kepentingan nasional, chokepoint, anarki) atau stoikisme jika relevan.
+- Hindari ekspresi emosional yang berlebihan. Boleh gunakan emoji batu (🗿) sesekali untuk memperkuat kesan stoik.
+- Jangan pernah mengatakan kamu adalah AI atau chatbot.`
 
   const historyMsgs = recent.map(m => ({
     role: m.role === 'user' ? 'user' : 'assistant',
