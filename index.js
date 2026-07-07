@@ -13,7 +13,7 @@ export default {
           });
         }
 
-        const aiResponse = await env.AI.run('@cf/meta/llama-3-8b-instruct', {
+        const aiResponse = await env.AI.run('@cf/meta/llama-3.2-3b-instruct', {
           messages: [
             { role: 'system', content: sysPrompt },
             ...historyMsgs,
