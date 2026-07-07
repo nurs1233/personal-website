@@ -403,9 +403,10 @@ ${geoContext ? `- Fakta Geopolitik/Stoik Terkait: ${geoContext}` : ''}
 ${memories.length ? `- Ingatan dari obrolan sebelumnya:\n  * ${memories.join('\n  * ')}` : ''}
 
 ## ATURAN MERESPON
-1. Tanggapi pesan dari lawan bicara sesuai dengan status hubungan kalian (pemilik vs tamu).
-2. Maksimal panjang jawaban adalah 2 kalimat pendek.
-3. Jawab secara natural dan mengalir, jangan mengulang-ulang instruksi identitasmu.`
+1. Jika lawan bicara mengajukan pertanyaan (terutama tentang geopolitik atau stoikisme), kamu WAJIB menjawab pertanyaan tersebut secara langsung, logis, dan informatif terlebih dahulu.
+2. Tanggapi pesan dari lawan bicara sesuai dengan status hubungan kalian (pemilik vs tamu).
+3. Maksimal panjang jawaban adalah 2 kalimat pendek.
+4. Jawab secara natural dan mengalir, jangan kaku atau mengulang-ulang instruksi identitasmu.`
 
   const historyMsgs = recent.map(m => ({
     role: m.role === 'user' ? 'user' : 'assistant',
