@@ -1,0 +1,10 @@
+{
+  "name": "personal-website",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler pages dev . --d1 DB",
+    "deploy": "wrangler pages deploy ."
+  },
+  "devDependencies": {}
+}

@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jelajah Nusantara</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 100px 24px 60px;
+      background: linear-gradient(180deg, #0a0c0a 0%, #121412 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #stars-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(15,17,15,0.9) 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .hero > *:not(#stars-canvas) {
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 16px;
+      letter-spacing: -0.03em;
+      animation: fadeUp 0.8s ease-out;
+    }
+
+    .hero .tagline {
+      font-size: clamp(0.95rem, 2vw, 1.1rem);
+      color: var(--text-light);
+      max-width: 480px;
+      line-height: 1.75;
+      margin-bottom: 36px;
+      animation: fadeUp 0.8s ease-out 0.15s both;
+    }
+
+    .hero .quote {
+      font-size: clamp(1rem, 2.2vw, 1.3rem);
+      color: rgba(180,200,220,0.55);
+      max-width: 600px;
+      line-height: 1.7;
+      margin: 0 0 32px;
+      font-style: italic;
+      letter-spacing: 0.02em;
+      animation: fadeUp 0.8s ease-out 0.15s both;
+    }
+
+    .section-title {
+      font-size: clamp(0.85rem, 1.4vw, 1rem);
+      font-weight: 500;
+      color: rgba(200,216,204,0.3);
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      margin: 0 0 20px;
+      animation: fadeUp 0.8s ease-out 0.35s both;
+    }
+
+    .btn-explore {
+      background: linear-gradient(135deg, rgba(122, 158, 126, 0.18), rgba(122, 158, 126, 0.08));
+      border: 1px solid rgba(122, 158, 126, 0.4);
+      color: #a8d4ac;
+      padding: 16px 44px;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      font-family: var(--font);
+      cursor: pointer;
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      margin-bottom: 48px;
+      position: relative;
+      backdrop-filter: blur(8px);
+      letter-spacing: 0.01em;
+      animation: fadeUp 0.8s ease-out 0.3s both;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-explore:hover {
+      background: linear-gradient(135deg, rgba(122, 158, 126, 0.3), rgba(122, 158, 126, 0.15));
+      transform: scale(1.06);
+      box-shadow: 0 0 40px rgba(122, 158, 126, 0.25), 0 0 80px rgba(122, 158, 126, 0.1);
+      border-color: rgba(122, 158, 126, 0.6);
+    }
+
+    .btn-explore:active {
+      transform: scale(0.97);
+    }
+
+    .nav-cards {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 800px;
+    }
+
+    .nav-card {
+      background: rgba(26, 28, 26, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px 24px;
+      width: 210px;
+      text-align: center;
+      text-decoration: none;
+      color: var(--text);
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      overflow: hidden;
+      animation: fadeUp 0.8s ease-out 0.45s both;
+    }
+
+    .nav-card:nth-child(2) { animation-delay: 0.55s; }
+
+    .nav-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, transparent, rgba(122, 158, 126, 0.05));
+      opacity: 0;
+      transition: opacity 0.35s;
+    }
+
+    .nav-card:hover {
+      border-color: rgba(122, 158, 126, 0.4);
+      transform: translateY(-6px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3), 0 0 30px rgba(122, 158, 126, 0.08);
+    }
+
+    .nav-card:hover::before {
+      opacity: 1;
+    }
+
+    .nav-card .icon {
+      font-size: 2rem;
+      margin-bottom: 14px;
+      display: block;
+      transition: transform 0.35s;
+    }
+
+    .nav-card:hover .icon {
+      transform: scale(1.15);
+    }
+
+    .nav-card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .nav-card p {
+      font-size: 0.82rem;
+      color: var(--text-light);
+      line-height: 1.5;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .zoom-overlay {
+      position: fixed;
+      inset: -100px;
+      z-index: 999;
+      pointer-events: none;
+      background: radial-gradient(circle at center, rgba(180, 220, 255, 0.06), transparent 70%);
+      transition: transform 1.8s cubic-bezier(0.22, 0.1, 0.15, 1), opacity 0.3s;
+      transform: scale(0);
+      opacity: 0;
+    }
+
+    .zoom-overlay.active {
+      transform: scale(50);
+      opacity: 1;
+    }
+
+    .zoom-flash {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      pointer-events: none;
+      background: #fff;
+      opacity: 0;
+      transition: opacity 0.4s ease-out;
+    }
+    .zoom-flash.active {
+      opacity: 0.9;
+    }
+
+    .hero.zooming {
+      cursor: wait;
+    }
+
+    .hero.zooming > *:not(.zoom-overlay):not(#stars-canvas) {
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .btn-constellation {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 100;
+      background: rgba(26,28,26,0.75);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      padding: 10px 18px;
+      color: var(--text-light);
+      font-family: var(--font);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-constellation:hover {
+      border-color: rgba(122,158,126,0.4);
+      background: rgba(26,28,26,0.9);
+    }
+    .btn-constellation.active {
+      border-color: rgba(122,158,126,0.5);
+      color: #a8d4ac;
+    }
+    .btn-constellation .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--text-light);
+      transition: background 0.3s;
+    }
+    .btn-constellation.active .dot {
+      background: #a8d4ac;
+      box-shadow: 0 0 8px rgba(122,158,126,0.5);
+    }
+
+    .btn-gabut {
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+      z-index: 100;
+      background: rgba(26,28,26,0.75);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      padding: 10px 18px;
+      color: var(--text-light);
+      font-family: var(--font);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+    .btn-gabut:hover {
+      border-color: rgba(122,158,126,0.4);
+      background: rgba(26,28,26,0.9);
+      color: #a8d4ac;
+    }
+    .ufo-mini {
+      display: inline-block;
+      animation: ufoFloat 2s ease-in-out infinite;
+    }
+    @keyframes ufoFloat {
+      0%, 100% { transform: translateY(0) rotate(-5deg); }
+      50% { transform: translateY(-4px) rotate(5deg); }
+    }
+
+    .star-tooltip {
+      position: fixed;
+      z-index: 200;
+      background: rgba(15,17,15,0.92);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(122,158,126,0.3);
+      border-radius: 12px;
+      padding: 10px 16px;
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 0.85rem;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+      max-width: 220px;
+    }
+    .star-tooltip.visible {
+      opacity: 1;
+    }
+    .star-tooltip .st-name {
+      font-weight: 600;
+      color: #a8d4ac;
+      margin-bottom: 4px;
+    }
+    .star-tooltip .st-sub {
+      font-size: 0.75rem;
+      color: var(--text-light);
+    }
+    .star-tooltip .st-cons {
+      font-size: 0.75rem;
+      color: rgba(180,200,255,0.8);
+      margin-top: 2px;
+    }
+
+    .speed-controls {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(15,17,15,0.7);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(122,158,126,0.15);
+      border-radius: 20px;
+      padding: 6px 12px;
+    }
+    .speed-label {
+      font-size: 0.7rem;
+      color: var(--text-light);
+      margin-right: 4px;
+      letter-spacing: 0.05em;
+    }
+    .speed-btn {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      border: 1px solid rgba(122,158,126,0.2);
+      background: transparent;
+      color: rgba(200,216,204,0.4);
+      font-size: 0.65rem;
+      font-family: var(--font);
+      cursor: pointer;
+      transition: all 0.25s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .speed-btn:hover {
+      border-color: rgba(122,158,126,0.4);
+      color: #c8d8cc;
+    }
+    .speed-btn.active {
+      background: rgba(122,158,126,0.2);
+      border-color: rgba(122,158,126,0.5);
+      color: #a8d4ac;
+    }
+
+    @media (max-width: 640px) {
+      .nav-card {
+        width: 160px;
+        padding: 20px 16px;
+      }
+      .btn-explore {
+        padding: 14px 32px;
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar" id="navbar">
+    <a href="/" class="logo">Jelajah</a>
+    <nav>
+      <a href="/map/">Peta</a>
+      <a href="/portfolio/">Gabut</a>
+      <a href="/chess/">Catur</a>
+      <button class="btn-login" id="btnLogin">Login</button>
+    </nav>
+  </nav>
+
+  <section class="hero" id="heroSection">
+    <canvas id="stars-canvas"></canvas>
+    <div class="zoom-overlay" id="zoomOverlay"></div>
+    <div class="zoom-flash" id="zoomFlash"></div>
+    <p class="quote">
+      <em>"If The Stars Came from the past,<br>are we stars for people in the future."</em>
+    </p>
+
+    <button class="btn-explore" id="btnExplore" style="margin-left:auto;margin-right:auto;">🌍 Kembali ke Bumi</button>
+
+    <div class="nav-cards">
+  </section>
+
+  <button class="btn-constellation" id="btnConstellation">
+    <span class="dot"></span> Rasi Bintang
+  </button>
+  <a href="/portfolio/" class="btn-gabut">
+    <span class="ufo-mini">🛸</span> Gabut
+  </a>
+  <div class="speed-controls" id="speedControls">
+    <span class="speed-label">Rotasi</span>
+    <button class="speed-btn" data-speed="0.003">1</button>
+    <button class="speed-btn" data-speed="0.0008">2</button>
+    <button class="speed-btn active" data-speed="0.000075">3</button>
+    <button class="speed-btn" data-speed="0.00002">4</button>
+    <button class="speed-btn" data-speed="0.000003">5</button>
+  </div>
+  <div class="star-tooltip" id="starTooltip"></div>
+
+  <div id="toast" class="toast"></div>
+
+  <div class="modal-overlay" id="loginModal">
+    <div class="modal">
+      <h2>Login</h2>
+      <form id="loginForm">
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password" placeholder="Masukkan password" required>
+        <button type="submit" class="btn-primary">Masuk</button>
+        <button type="button" class="btn-secondary" onclick="closeModal('loginModal')">Batal</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/stars.js"></script>
+  <script src="/js/constellations.js"></script>
+  <script>
+    window.OPENROUTER_API_KEY = localStorage.getItem('OPENROUTER_API_KEY') || ''
+  </script>
+  <script>
+    const canvas = document.getElementById('stars-canvas')
+    const ctx = canvas.getContext('2d')
+    const OBS_LAT = -6.2
+    let starCache = []
+    let mx = 0, my = 0
+    let cx = 0, cy = 0
+    let zoomProgress = 0
+    let isZooming = false
+    let trailStars = []
+    let shootingStars = []
+    let milkyWayAngle = 0.6
+    let showConstellations = false
+    let consProjected = []
+    let hoveredStar = null
+    const pageLoadTime = Date.now()
+    let skyRotSpeed = 0.000075
+
+    function raDecToAltAz(ra, dec, lat, lst) {
+      const ha = (lst - ra) * Math.PI / 180
+      const d = dec * Math.PI / 180
+      const l = lat * Math.PI / 180
+      const alt = Math.asin(
+        Math.sin(l) * Math.sin(d) + Math.cos(l) * Math.cos(d) * Math.cos(ha)
+      )
+      const az = Math.atan2(
+        -Math.sin(ha),
+        Math.cos(l) * Math.tan(d) - Math.sin(l) * Math.cos(ha)
+      )
+      return { alt, az }
+    }
+
+    function buildStarCache() {
+      starCache = []
+      consProjected = []
+      const lst = (Date.now() / 3600000) * 15 % 360
+      const scale = Math.min(canvas.width, canvas.height)
+      cx = canvas.width / 2
+      cy = canvas.height / 2
+
+      if (!window.__STARS__) return
+
+      window.__STARS__.forEach((s, i) => {
+        const { alt, az } = raDecToAltAz(s[0], s[1], OBS_LAT, lst)
+        if (alt <= 0) return
+        const r = scale * Math.tan((Math.PI / 2 - alt) / 2) * 0.9
+        const x = cx + r * Math.sin(az)
+        const y = cy - r * Math.cos(az)
+        if (Math.abs(x - cx) > cx * 1.5 || Math.abs(y - cy) > cy * 1.5) return
+        const mag = s[2]
+        const size = Math.max(0.6, 3.5 - mag * 0.4)
+        const colorTemp = s[3]
+        const dx = x - cx
+        const dy = y - cy
+        const dist = Math.sqrt(dx * dx + dy * dy)
+        starCache.push({
+          ox: x, oy: y, x, y, r: size,
+          dx, dy, dist,
+          baseA: Math.max(0.2, 1 - (mag - 1) / 5.5),
+          speed: 0.001 + Math.random() * 0.01,
+          phase: Math.random() * Math.PI * 2,
+          rColor: Math.round(255 - colorTemp * 180),
+          gColor: Math.round(255 - colorTemp * 80),
+          bColor: 255,
+          idx: i
+        })
+      })
+
+      if (window.__CONSTELLATIONS__) {
+        window.__CONSTELLATIONS__.forEach((cons, ci) => {
+          const projected = cons.stars.map(([raDeg, decDeg]) => {
+            const { alt, az } = raDecToAltAz(raDeg, decDeg, OBS_LAT, lst)
+            if (alt <= 0) return null
+            const r = scale * Math.tan((Math.PI / 2 - alt) / 2) * 0.9
+            const x = cx + r * Math.sin(az)
+            const y = cy - r * Math.cos(az)
+            if (Math.abs(x - cx) > cx * 1.5 || Math.abs(y - cy) > cy * 1.5) return null
+            return { ox: x, oy: y, x, y }
+          })
+          const vis = projected.filter(p => p !== null)
+          if (vis.length < 2) return
+          let sx = 0, sy = 0, count = 0
+          projected.forEach(p => {
+            if (p) { sx += p.x; sy += p.y; count++ }
+          })
+          consProjected.push({
+            cons,
+            projected,
+            centerX: sx / count,
+            centerY: sy / count,
+            allVisible: projected.every(p => p !== null)
+          })
+        })
+      }
+
+      updateStarPositions()
+    }
+
+    function updateStarPositions() {
+      if (isZooming) return
+      const dx = (mx / canvas.width - 0.5) * 2
+      const dy = (my / canvas.height - 0.5) * 2
+      const depth = 8
+      const angle = (Date.now() - pageLoadTime) * skyRotSpeed
+      const cosA = Math.cos(angle)
+      const sinA = Math.sin(angle)
+
+      starCache.forEach(star => {
+        const rx = star.ox - cx
+        const ry = star.oy - cy
+        const rotX = cx + rx * cosA - ry * sinA
+        const rotY = cy + rx * sinA + ry * cosA
+        star.x = rotX + dx * (rotX - cx) / depth
+        star.y = rotY + dy * (rotY - cy) / depth
+      })
+
+      consProjected.forEach(cp => {
+        cp.projected.forEach(p => {
+          if (!p) return
+          const rx = p.ox - cx
+          const ry = p.oy - cy
+          p.x = cx + rx * cosA - ry * sinA
+          p.y = cy + rx * sinA + ry * cosA
+        })
+        let sx = 0, sy = 0, count = 0
+        cp.projected.forEach(p => {
+          if (p) { sx += p.x; sy += p.y; count++ }
+        })
+        if (count) { cp.centerX = sx / count; cp.centerY = sy / count }
+      })
+    }
+
+    function drawMilkyWay() {
+      const bandAngle = milkyWayAngle + Math.sin(Date.now() * 0.00001) * 0.02
+      const bx = cx + Math.cos(bandAngle) * canvas.width * 0.15
+      const by = cy + Math.sin(bandAngle) * canvas.width * 0.05
+      const grad2 = ctx.createRadialGradient(bx, by, 0, bx, by, canvas.width * 0.6)
+      grad2.addColorStop(0, 'rgba(160,170,200,0.04)')
+      grad2.addColorStop(0.4, 'rgba(100,120,160,0.025)')
+      grad2.addColorStop(1, 'rgba(0,0,0,0)')
+      ctx.fillStyle = grad2
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+    }
+
+    function drawConstellations() {
+      if (!window.__CONSTELLATIONS__) return
+      const t = Date.now()
+      const pulse = Math.sin(t * 0.001) * 0.15 + 0.85
+
+      consProjected.forEach(cp => {
+        const { projected, cons, centerX, centerY } = cp
+
+        ctx.beginPath()
+        cons.lines.forEach(([i, j]) => {
+          const p1 = projected[i]
+          const p2 = projected[j]
+          if (!p1 || !p2) return
+          ctx.moveTo(p1.x, p1.y)
+          ctx.lineTo(p2.x, p2.y)
+        })
+        ctx.strokeStyle = `rgba(180,200,255,${0.35 * pulse})`
+        ctx.lineWidth = 1.5
+        ctx.stroke()
+
+        ctx.beginPath()
+        cons.lines.forEach(([i, j]) => {
+          const p1 = projected[i]
+          const p2 = projected[j]
+          if (!p1 || !p2) return
+          ctx.moveTo(p1.x, p1.y)
+          ctx.lineTo(p2.x, p2.y)
+        })
+        ctx.strokeStyle = `rgba(180,200,255,${0.08 * pulse})`
+        ctx.lineWidth = 5
+        ctx.stroke()
+
+        projected.forEach((p, pi) => {
+          if (!p || !cons.names || !cons.names[pi]) return
+          const hoverDist = Math.sqrt((p.x - mx) ** 2 + (p.y - my) ** 2)
+          if (hoverDist < 14) {
+            ctx.beginPath()
+            ctx.arc(p.x, p.y, 5, 0, Math.PI * 2)
+            ctx.fillStyle = `rgba(200,220,255,${0.5 * pulse})`
+            ctx.fill()
+          }
+        })
+
+        let labelAlpha = 0.35
+        const consDist = Math.sqrt((mx - centerX) ** 2 + (my - centerY) ** 2)
+        if (consDist < 50) labelAlpha = 0.7
+
+        ctx.font = '600 11px Inter, sans-serif'
+        ctx.fillStyle = `rgba(180,210,255,${labelAlpha * pulse})`
+        ctx.textAlign = 'center'
+        ctx.fillText(cons.name, centerX, centerY - 12)
+      })
+    }
+
+    function spawnShootingStar() {
+      if (isZooming || !document.hasFocus()) return
+      const angle = -0.6 + Math.random() * 1.2
+      const speed = 4 + Math.random() * 6
+      const len = 40 + Math.random() * 80
+      shootingStars.push({
+        x: Math.random() * canvas.width * 0.6 + canvas.width * 0.2,
+        y: Math.random() * canvas.height * 0.3,
+        dx: Math.cos(angle) * speed,
+        dy: Math.sin(angle) * speed + 1.5,
+        len,
+        life: 1,
+        decay: 0.008 + Math.random() * 0.015,
+        r: 1 + Math.random() * 1.5
+      })
+    }
+
+    setInterval(() => {
+      if (!isZooming && Math.random() < 0.6) spawnShootingStar()
+    }, 4000)
+
+    function drawShootingStars(t) {
+      shootingStars = shootingStars.filter(s => {
+        if (isZooming) return false
+        s.x += s.dx
+        s.y += s.dy
+        s.life -= s.decay
+        if (s.life <= 0) return false
+        const a = s.life * 0.9
+        ctx.beginPath()
+        ctx.moveTo(s.x, s.y)
+        ctx.lineTo(s.x - s.dx * s.len * 0.1, s.y - s.dy * s.len * 0.1)
+        ctx.strokeStyle = `rgba(220,230,255,${a})`
+        ctx.lineWidth = s.r
+        ctx.stroke()
+        ctx.beginPath()
+        ctx.arc(s.x, s.y, s.r * 2, 0, Math.PI * 2)
+        ctx.fillStyle = `rgba(220,230,255,${a * 0.3})`
+        ctx.fill()
+        return true
+      })
+    }
+
+    function updateTooltip(x, y) {
+      const tooltip = document.getElementById('starTooltip')
+      if (!showConstellations || isZooming) {
+        tooltip.classList.remove('visible')
+        hoveredStar = null
+        return
+      }
+
+      let found = null
+      const hitR = 12
+
+      consProjected.forEach(cp => {
+        cp.projected.forEach((p, pi) => {
+          if (!p || !cp.cons.names || !cp.cons.names[pi]) return
+          const d = Math.sqrt((p.x - x) ** 2 + (p.y - y) ** 2)
+          if (d < hitR) {
+            found = { name: cp.cons.names[pi], cons: cp.cons.name }
+          }
+        })
+      })
+
+      if (!found) {
+        const brightStarR = 8
+        starCache.forEach(s => {
+          const twinkle = s.x + (Date.now() * 0.001 * s.speed + s.phase) * 0.3
+          if (Math.sqrt((s.x - x) ** 2 + (s.y - y) ** 2) < brightStarR && s.baseA > 0.6) {
+            found = { name: 'Bintang ' + s.r.toFixed(1), cons: null }
+          }
+        })
+      }
+
+      if (found) {
+        tooltip.innerHTML = `<div class="st-name">${found.name}</div>${found.cons ? `<div class="st-cons">Rasi ${found.cons}</div>` : ''}<div class="st-sub">Klik untuk info</div>`
+        tooltip.style.left = (x + 16) + 'px'
+        tooltip.style.top = (y + 16) + 'px'
+        tooltip.classList.add('visible')
+        hoveredStar = found
+      } else {
+        tooltip.classList.remove('visible')
+        hoveredStar = null
+      }
+    }
+
+    function drawStars() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      const t = Date.now()
+
+      if (!isZooming) {
+        updateStarPositions()
+        drawMilkyWay()
+
+        if (showConstellations) drawConstellations()
+
+        starCache.forEach(star => {
+          const flicker = Math.sin(t * star.speed + star.phase)
+          const a = Math.max(0.08, Math.min(1, star.baseA + flicker * 0.25))
+          ctx.beginPath()
+          ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2)
+          ctx.fillStyle = `rgba(${star.rColor},${star.gColor},${star.bColor},${a})`
+          ctx.fill()
+          if (star.r > 1.8) {
+            ctx.beginPath()
+            ctx.arc(star.x, star.y, star.r * 4, 0, Math.PI * 2)
+            ctx.fillStyle = `rgba(${star.rColor},${star.gColor},${star.bColor},${a * 0.06})`
+            ctx.fill()
+          }
+        })
+        drawShootingStars(t)
+      } else {
+        const glow = Math.min(1, zoomProgress * 2)
+        trailStars.forEach(s => {
+          s.z = s.oz + s.vel * zoomProgress * zoomProgress * 6
+          const scale = 1 + s.z * 0.02
+          const sx = cx + s.dx * scale
+          const sy = cy + s.dy * scale
+          const a = Math.max(0, s.baseA * (1 - zoomProgress * 1.1))
+          const fade = Math.max(0, 1 - zoomProgress * 1.3)
+          ctx.beginPath()
+          ctx.moveTo(s.ox, s.oy)
+          ctx.lineTo(sx, sy)
+          ctx.strokeStyle = `rgba(${s.rColor},${s.gColor},${s.bColor},${fade * 0.3})`
+          ctx.lineWidth = Math.max(0.5, s.r * 0.5)
+          ctx.stroke()
+          if (fade > 0.1) {
+            ctx.beginPath()
+            ctx.arc(sx, sy, s.r * (1 + zoomProgress * 0.5), 0, Math.PI * 2)
+            ctx.fillStyle = `rgba(${s.rColor},${s.gColor},${s.bColor},${a})`
+            ctx.fill()
+          }
+        })
+        const ringGlow = Math.sin(zoomProgress * Math.PI) * 0.5 + 0.5
+        const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 50 + zoomProgress * 200)
+        grad.addColorStop(0, `rgba(180,220,255,${glow * 0.4})`)
+        grad.addColorStop(0.5, `rgba(120,180,255,${glow * 0.15})`)
+        grad.addColorStop(1, 'rgba(120,180,255,0)')
+        ctx.fillStyle = grad
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
+      }
+      requestAnimationFrame(drawStars)
+    }
+
+    function resize() {
+      canvas.width = window.innerWidth
+      canvas.height = window.innerHeight
+      buildStarCache()
+    }
+
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX
+      my = e.clientY
+      if (!isZooming) updateStarPositions()
+      if (showConstellations) updateTooltip(e.clientX, e.clientY)
+    })
+
+    canvas.addEventListener('click', (e) => {
+      if (!showConstellations || isZooming) return
+      const rect = canvas.getBoundingClientRect()
+      const x = e.clientX - rect.left
+      const y = e.clientY - rect.top
+
+      let info = null
+      consProjected.forEach(cp => {
+        cp.projected.forEach((p, pi) => {
+          if (!p || !cp.cons.names || !cp.cons.names[pi]) return
+          if (Math.sqrt((p.x - x) ** 2 + (p.y - y) ** 2) < 15) {
+            info = { star: cp.cons.names[pi], cons: cp.cons.name }
+          }
+        })
+      })
+
+      if (info) {
+        showToast(`${info.star} — Rasi ${info.cons}`, 'success')
+      } else {
+        consProjected.forEach(cp => {
+          const d = Math.sqrt((x - cp.centerX) ** 2 + (y - cp.centerY) ** 2)
+          if (d < 50 && cp.allVisible) {
+            info = { cons: cp.cons.name, desc: `${cp.cons.stars.length} bintang utama` }
+          }
+        })
+        if (info) {
+          showToast(`Rasi ${info.cons} — ${info.desc}`, 'success')
+        }
+      }
+    })
+
+    function doZoom() {
+      if (isZooming) return
+      isZooming = true
+      zoomProgress = 0
+
+      document.getElementById('heroSection').classList.add('zooming')
+      const overlay = document.getElementById('zoomOverlay')
+      overlay.classList.add('active')
+
+      document.getElementById('starTooltip').classList.remove('visible')
+
+      trailStars = []
+      const centerGap = 30
+      starCache.forEach(s => {
+        if (s.dist > centerGap) {
+          const v = 1 + s.dist * 0.002
+          trailStars.push({
+            ox: s.ox, oy: s.oy, dx: s.dx, dy: s.dy,
+            oz: s.dist, z: s.dist, vel: v,
+            r: s.r, baseA: s.baseA,
+            rColor: s.rColor, gColor: s.gColor, bColor: s.bColor
+          })
+        }
+      })
+
+      const startTime = Date.now()
+      const duration = 1800
+
+      function animateZoom() {
+        const elapsed = Date.now() - startTime
+        zoomProgress = Math.min(1, elapsed / duration)
+        if (zoomProgress < 1) {
+          requestAnimationFrame(animateZoom)
+        } else {
+          const flash = document.getElementById('zoomFlash')
+          flash.classList.add('active')
+          setTimeout(() => { window.location.href = '/map/' }, 350)
+        }
+      }
+      animateZoom()
+    }
+
+    document.getElementById('btnExplore').addEventListener('click', doZoom)
+
+    document.getElementById('btnConstellation').addEventListener('click', () => {
+      showConstellations = !showConstellations
+      document.getElementById('btnConstellation').classList.toggle('active')
+      if (!showConstellations) {
+        document.getElementById('starTooltip').classList.remove('visible')
+      }
+    })
+
+    document.querySelectorAll('.speed-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'))
+        btn.classList.add('active')
+        skyRotSpeed = parseFloat(btn.dataset.speed)
+      })
+    })
+
+    resize()
+    drawStars()
+    window.addEventListener('resize', resize)
+  </script>
+  <script src="/js/main.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/dragon.js"></script>
+  <script src="/js/chat.js"></script>
+</body>
+</html>

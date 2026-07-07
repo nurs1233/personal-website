@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gabut — Jelajah Nusantara</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .page-content {
+      padding: 96px 24px 64px;
+      max-width: 900px;
+      margin: 0 auto;
+      min-height: 100vh;
+    }
+    .page-content h1 {
+      font-size: 1.8rem;
+      margin-bottom: 8px;
+    }
+    .page-content .subtitle {
+      color: var(--text-light);
+      margin-bottom: 40px;
+    }
+
+    .dragon-arena {
+      background: rgba(10,14,10,0.6);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 24px;
+      text-align: center;
+      position: relative;
+      min-height: 220px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    #dragonCanvas {
+      image-rendering: pixelated;
+      cursor: pointer;
+      border-radius: 12px;
+      background: radial-gradient(ellipse at center, rgba(40,50,60,0.2), transparent);
+      width: 128px;
+      height: 128px;
+    }
+    .dragon-name {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #a8d4ac;
+      margin-top: 8px;
+      letter-spacing: 0.05em;
+    }
+    .dragon-status {
+      font-size: 0.8rem;
+      color: var(--text-light);
+      margin-top: 4px;
+      font-family: monospace;
+    }
+    .mood-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+      margin-top: 16px;
+    }
+    .mood-btn {
+      background: rgba(26,28,26,0.6);
+      border: 1px solid rgba(122,158,126,0.2);
+      border-radius: 20px;
+      padding: 6px 14px;
+      color: var(--text-light);
+      font-family: var(--font);
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+    .mood-btn:hover {
+      border-color: rgba(122,158,126,0.4);
+      color: #c8d8cc;
+    }
+    .mood-btn.active {
+      background: rgba(122,158,126,0.15);
+      border-color: rgba(122,158,126,0.5);
+      color: #a8d4ac;
+    }
+
+    .project-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .project-card {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 24px;
+      border: 1px solid var(--border);
+      transition: box-shadow 0.2s;
+    }
+    .project-card:hover {
+      box-shadow: 0 4px 16px var(--shadow);
+    }
+    .project-card h3 {
+      font-size: 1.05rem;
+      margin-bottom: 6px;
+    }
+    .project-card p {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+    .project-card .stack {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .project-card .stack span {
+      background: var(--bg);
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      color: var(--text-light);
+      border: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar scrolled" id="navbar">
+    <a href="/" class="logo">Jelajah</a>
+    <nav>
+      <a href="/map/">Peta</a>
+      <a href="/portfolio/" class="active">Gabut</a>
+    </nav>
+  </nav>
+
+  <main class="page-content">
+    <h1>🐉 Gabut</h1>
+    <p class="subtitle">Project iseng &amp; hasil vibe code</p>
+
+    <div class="project-grid">
+      <div class="project-card">
+        <h3>🐉 Ascalon Dragonarium</h3>
+        <p>Desktop pet dragon virtual — Ignis si naga api. Bisa menetas, terbang, jalan, tidur, ketawa, dan bereaksi ke kursor. Python tkinter + porting ke web.</p>
+        <div class="stack">
+          <span>Python</span>
+          <span>tkinter</span>
+          <span>Canvas</span>
+          <span>Pixel Art</span>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <h3>🌍 Website Ini</h3>
+        <p>Peta interaktif Indonesia dengan foto pemandangan, 3D globe Three.js, &amp; 2D map. Serverless di Cloudflare.</p>
+        <div class="stack">
+          <span>Cloudflare Pages</span>
+          <span>D1</span>
+          <span>Three.js</span>
+          <span>Leaflet</span>
+          <span>ImgBB</span>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <h3>♟ Catur — Stockfish AI</h3>
+        <p>Main catur melawan Stockfish engine langsung di browser. Drag &amp; drop, highlight legal moves, notasi langkah, dan statistik win/loss per level.</p>
+        <div class="stack">
+          <span>chess.js</span>
+          <span>Stockfish.js</span>
+          <span>Web Worker</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/main.js"></script>
+  <script src="/js/dragon.js"></script>
+  <script src="/js/chat.js"></script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tentang — Jelajah Nusantara</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .page-content {
+      padding: 96px 24px 64px;
+      max-width: 700px;
+      margin: 0 auto;
+      min-height: 100vh;
+    }
+    .page-content h1 {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+    }
+    .page-content p {
+      color: var(--text-light);
+      line-height: 1.8;
+      margin-bottom: 16px;
+    }
+    .social-links {
+      margin-top: 32px;
+      display: flex;
+      gap: 16px;
+    }
+    .social-links a {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .social-links a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar scrolled" id="navbar">
+    <a href="/" class="logo">Jelajah</a>
+    <nav>
+      <a href="/map/">Peta</a>
+      <a href="/portfolio/">Gabut</a>
+      <a href="/about/" class="active">Tentang</a>
+    </nav>
+  </nav>
+
+  <main class="page-content">
+    <h1>👋 Tentang</h1>
+    <p>
+      Halo! Aku suka jalan-jalan, motret pemandangan, dan iseng coding.
+      Website ini tempat aku dokumentasi foto-foto dari berbagai tempat di Indonesia —
+      sekalian belajar bikin web pake Cloudflare Pages &amp; Leaflet.
+    </p>
+    <p>
+      Foto-foto di sini murni jepretan sendiri, disimpan di Imgur biar gratis.
+      Kalau ada pertanyaan atau mau ngobrol, hit me up!
+    </p>
+    <div class="social-links">
+      <a href="https://github.com/ripan231" target="_blank">GitHub</a>
+    </div>
+  </main>
+  <script src="/js/dragon.js"></script>
+  <script src="/js/chat.js"></script>
+</body>
+</html>

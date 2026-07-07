@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Peta — Jelajah Nusantara</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    html, body { height: 100%; margin: 0; background: #050605; overflow: hidden; }
+    #globe-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
+    .navbar { z-index: 1000; }
+    .globe-label {
+      color: #c8d8cc;
+      font-family: Inter, sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      text-shadow: 0 0 12px rgba(0,0,0,0.9), 0 0 4px rgba(0,0,0,0.8);
+      pointer-events: none;
+      white-space: nowrap;
+      padding: 4px 10px;
+      background: rgba(15,17,15,0.7);
+      border-radius: 8px;
+      border: 1px solid rgba(122,158,126,0.3);
+      backdrop-filter: blur(4px);
+      transform: translate(-50%, -100%);
+      margin-top: -12px;
+    }
+    .globe-label .gl-title {
+      font-weight: 600;
+      color: #e8f0ea;
+    }
+    .globe-label .gl-date {
+      font-size: 10px;
+      color: rgba(200,216,204,0.6);
+      margin-top: 2px;
+    }
+    .globe-pin {
+      width: 32px; height: 32px;
+      cursor: pointer;
+      transform: translate(-50%, -100%);
+    }
+    .globe-pin svg {
+      width: 100%; height: 100%;
+      filter: drop-shadow(0 2px 8px rgba(122,158,126,0.4));
+    }
+    .globe-pin:hover svg {
+      filter: drop-shadow(0 2px 16px rgba(122,158,126,0.7));
+    }
+    .popup-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+    }
+    .popup-overlay.open { display: flex; }
+    .popup-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      max-width: 360px;
+      width: 90%;
+      overflow: hidden;
+      box-shadow: 0 16px 64px rgba(0,0,0,0.5);
+    }
+    .popup-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      display: block;
+    }
+    .popup-card .popup-body {
+      padding: 16px 20px;
+    }
+    .popup-card .popup-body h3 {
+      margin: 0 0 4px;
+      font-size: 1.1rem;
+      color: var(--text);
+    }
+    .popup-card .popup-body .date {
+      font-size: 0.8rem;
+      color: var(--text-light);
+      margin-bottom: 8px;
+    }
+    .popup-card .popup-body .coords {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      font-family: monospace;
+      margin-bottom: 8px;
+    }
+    .popup-card .popup-body .desc {
+      font-size: 0.85rem;
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .popup-card .popup-body .btn-close-popup {
+      margin-top: 12px;
+      background: rgba(122,158,126,0.15);
+      border: 1px solid rgba(122,158,126,0.3);
+      color: #a8d4ac;
+      padding: 8px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: var(--font);
+      font-size: 0.85rem;
+      width: 100%;
+    }
+    .popup-card .popup-body .btn-close-popup:hover {
+      background: rgba(122,158,126,0.25);
+    }
+    .globe-popup-coords {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      margin-bottom: 12px;
+      font-family: monospace;
+    }
+    .popup-card .popup-body .btn-delete-popup {
+      margin-top: 8px;
+      background: rgba(200,80,80,0.15);
+      border: 1px solid rgba(200,80,80,0.3);
+      color: #e08080;
+      padding: 8px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: var(--font);
+      font-size: 0.85rem;
+      width: 100%;
+    }
+    .popup-card .popup-body .btn-delete-popup:hover {
+      background: rgba(200,80,80,0.25);
+    }
+
+    .globe-controls {
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .globe-ctrl-btn {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      border: 1px solid rgba(122,158,126,0.3);
+      background: rgba(15,17,15,0.8);
+      backdrop-filter: blur(8px);
+      color: #c8d8cc;
+      font-size: 1.3rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      font-family: var(--font);
+    }
+    .globe-ctrl-btn:hover {
+      border-color: rgba(122,158,126,0.5);
+      background: rgba(26,28,26,0.9);
+      color: #a8d4ac;
+    }
+    .globe-ctrl-btn:active {
+      transform: scale(0.92);
+    }
+    .globe-ctrl-reset {
+      margin-top: 4px;
+      font-size: 1rem;
+    }
+
+    .globe-hint {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      color: rgba(200,216,204,0.35);
+      font-size: 0.75rem;
+      font-family: Inter, sans-serif;
+      pointer-events: none;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+      white-space: nowrap;
+      animation: hintPulse 3s ease-in-out infinite;
+    }
+    @keyframes hintPulse {
+      0%, 100% { opacity: 0.35; }
+      50% { opacity: 0.7; }
+    }
+
+    #map-2d {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 2;
+    }
+    #map-2d .leaflet-container {
+      background: #0a0e0a;
+    }
+    #map-2d .leaflet-control-zoom a {
+      background: rgba(15,17,15,0.85);
+      border-color: rgba(122,158,126,0.3);
+      color: #c8d8cc;
+    }
+    #map-2d .leaflet-control-zoom a:hover {
+      background: rgba(26,28,26,0.9);
+      color: #a8d4ac;
+    }
+    #map-2d .leaflet-popup-content-wrapper {
+      background: var(--bg-card);
+      color: var(--text);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+    #map-2d .leaflet-popup-tip {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+    }
+    .globe-ctrl-toggle {
+      font-size: 1.1rem;
+    }
+    .globe-ctrl-toggle.active {
+      background: rgba(122,158,126,0.2);
+      border-color: rgba(122,158,126,0.5);
+    }
+
+    .bottom-sheet {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      z-index: 2000;
+      background: var(--bg-card);
+      border-radius: 20px 20px 0 0;
+      border: 1px solid var(--border);
+      border-bottom: none;
+      padding: 12px 24px 28px;
+      transform: translateY(100%);
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      max-height: 70vh;
+      overflow-y: auto;
+      box-shadow: 0 -8px 40px rgba(0,0,0,0.5);
+    }
+    .bottom-sheet.open {
+      transform: translateY(0);
+    }
+    .bottom-sheet .bs-handle {
+      width: 36px; height: 4px;
+      border-radius: 2px;
+      background: rgba(200,216,204,0.2);
+      margin: 0 auto 16px;
+    }
+    .bottom-sheet h2 {
+      font-size: 1.2rem;
+      margin: 0 0 16px;
+      color: var(--text);
+    }
+    .bottom-sheet label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-light);
+      margin-bottom: 4px;
+      margin-top: 12px;
+    }
+    .bottom-sheet input, .bottom-sheet textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      font-family: Inter, sans-serif;
+      font-size: 0.9rem;
+      box-sizing: border-box;
+      outline: none;
+    }
+    .bottom-sheet input:focus, .bottom-sheet textarea:focus {
+      border-color: rgba(122,158,126,0.5);
+    }
+    .bottom-sheet textarea {
+      min-height: 60px;
+      resize: vertical;
+    }
+    .bottom-sheet .btn-primary {
+      margin-top: 16px;
+    }
+    .bottom-sheet .btn-secondary {
+      margin-top: 8px;
+    }
+    .bottom-sheet .globe-popup-coords {
+      font-size: 0.85rem;
+      color: rgba(122,158,126,0.8);
+      font-family: monospace;
+      margin: 4px 0 0;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar" id="navbar">
+    <a href="/" class="logo">Jelajah</a>
+    <nav>
+      <a href="/map/" class="active">Peta</a>
+      <a href="/portfolio/">Gabut</a>
+      <button class="btn-login" id="btnLogin">Login</button>
+    </nav>
+  </nav>
+
+  <div id="globe-container"></div>
+  <div id="map-2d" style="display:none;"></div>
+
+  <button class="fab-add" id="fabAdd" title="Tambah Foto">+</button>
+
+  <div class="globe-controls">
+    <button class="globe-ctrl-btn" id="btnZoomIn" title="Zoom In">+</button>
+    <button class="globe-ctrl-btn" id="btnZoomOut" title="Zoom Out">−</button>
+    <button class="globe-ctrl-btn globe-ctrl-reset" id="btnReset" title="Reset View">⟲</button>
+    <button class="globe-ctrl-btn globe-ctrl-toggle" id="btnToggleView" title="Ganti ke 2D">🗺</button>
+  </div>
+
+  <div class="globe-hint" id="mapHint">🖱 Geser &amp; putar • Scroll zoom • Klik pin lihat foto</div>
+
+  <div id="toast" class="toast"></div>
+
+  <div class="modal-overlay" id="loginModal">
+    <div class="modal">
+      <h2>Login</h2>
+      <form id="loginForm">
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password" placeholder="Masukkan password" required>
+        <button type="submit" class="btn-primary">Masuk</button>
+        <button type="button" class="btn-secondary" onclick="closeModal('loginModal')">Batal</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="bottom-sheet" id="addSheet">
+    <div class="bs-handle"></div>
+    <h2>Tambah Foto</h2>
+    <form id="addForm">
+      <label for="image">Pilih Foto</label>
+      <input type="file" name="image" accept="image/*" required>
+
+      <label for="title">Nama Tempat</label>
+      <input type="text" name="title" id="title" placeholder="Cth: Pantai Kuta" required>
+
+      <label for="description">Cerita Singkat</label>
+      <textarea name="description" id="description" placeholder="Apa yang menarik di sini..."></textarea>
+
+      <label>Lokasi</label>
+      <p class="globe-popup-coords" id="mapCoords">Klik di globe / peta untuk pilih lokasi</p>
+
+      <button type="submit" class="btn-primary">Simpan</button>
+      <button type="button" class="btn-secondary" id="cancelAdd">Batal</button>
+    </form>
+  </div>
+
+  <div class="popup-overlay" id="photoPopup">
+    <div class="popup-card" id="popupCard"></div>
+  </div>
+
+  <script src="/js/main.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/dragon.js"></script>
+  <script src="/js/chat.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    let leafletMap = null, leafletMarkers = [], selectedMarker2D = null
+
+    window.clearMarker2D = function() {
+      if (selectedMarker2D) { leafletMap.removeLayer(selectedMarker2D); selectedMarker2D = null }
+    }
+
+    window.openSheet = function(id) {
+      document.getElementById(id).classList.add('open')
+    }
+    window.closeSheet = function(id) {
+      document.getElementById(id).classList.remove('open')
+    }
+
+    function setCoords2D(lat, lng) {
+      if (typeof window.setSelectedCoords === 'function') {
+        window.setSelectedCoords(lat, lng)
+      }
+      document.getElementById('mapCoords').textContent = `${lat.toFixed(4)}, ${lng.toFixed(3)}`
+      if (selectedMarker2D) leafletMap.removeLayer(selectedMarker2D)
+      selectedMarker2D = L.circleMarker([lat, lng], {
+        radius: 8, fillColor: '#fff', color: '#a8d4ac', weight: 3, fillOpacity: 0.6
+      }).addTo(leafletMap)
+    }
+
+    function toggleMapView() {
+      const globe = document.getElementById('globe-container')
+      const map2d = document.getElementById('map-2d')
+      const btn = document.getElementById('btnToggleView')
+      const hint = document.getElementById('mapHint')
+      const is2d = map2d.style.display !== 'none'
+
+      if (is2d) {
+        map2d.style.display = 'none'
+        globe.style.display = 'block'
+        btn.textContent = '🗺'
+        btn.classList.remove('active')
+        hint.textContent = '🖱 Geser & putar • Scroll zoom • Klik pin lihat foto'
+        window.dispatchEvent(new Event('resize'))
+      } else {
+        globe.style.display = 'none'
+        map2d.style.display = 'block'
+        btn.textContent = '🌍'
+        btn.classList.add('active')
+        hint.textContent = '🖱 Geser • Scroll zoom • Klik pin lihat foto'
+
+        if (!leafletMap) {
+          leafletMap = L.map('map-2d', {
+            center: [-2.5, 115],
+            zoom: 5,
+            zoomControl: true,
+            attributionControl: false
+          })
+          L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            maxZoom: 19,
+            subdomains: 'abcd'
+          }).addTo(leafletMap)
+          L.control.attribution({ prefix: false, position: 'bottomright' }).addTo(leafletMap)
+
+          leafletMap.on('click', (e) => {
+            if (document.getElementById('addSheet').classList.contains('open')) {
+              setCoords2D(e.latlng.lat, e.latlng.lng)
+            }
+          })
+        }
+
+        leafletMap.invalidateSize()
+        loadPhotos2D()
+      }
+    }
+
+    function loadPhotos2D() {
+      leafletMarkers.forEach(m => leafletMap.removeLayer(m))
+      leafletMarkers = []
+
+      fetch('/api/photos')
+        .then(r => r.json())
+        .then(photos => {
+          photos.forEach(p => {
+            const marker = L.circleMarker([p.latitude, p.longitude], {
+              radius: 8,
+              fillColor: '#a8d4ac',
+              color: '#5a8a5e',
+              weight: 2,
+              opacity: 0.8,
+              fillOpacity: 0.7
+            }).addTo(leafletMap)
+
+            marker.bindPopup(`
+              <div style="font-family:Inter,sans-serif;min-width:200px">
+                <img src="${p.imgur_url}" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:8px" />
+                <h3 style="margin:0 0 2px;font-size:1rem">${p.title}</h3>
+                <div style="font-size:0.75rem;color:rgba(200,216,204,0.5);margin-bottom:4px">${p.created_at ? new Date(p.created_at).toLocaleDateString('id-ID') : ''}</div>
+                ${p.description ? `<p style="margin:0;font-size:0.85rem;color:rgba(200,216,204,0.8)">${p.description}</p>` : ''}
+              </div>
+            `, { className: 'leaflet-popup-dark' })
+
+            leafletMarkers.push(marker)
+          })
+        })
+        .catch(() => {})
+    }
+
+    document.getElementById('btnToggleView').addEventListener('click', toggleMapView)
+  </script>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="/js/globe.js"></script>
+</body>
+</html>

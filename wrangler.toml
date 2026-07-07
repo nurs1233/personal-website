@@ -1,0 +1,8 @@
+name = "personal-website"
+pages_build_output_dir = "."
+compatibility_date = "2025-01-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "personal-website-db"
+database_id = "94c3b533-e3f5-4a9d-bc18-67250c7e3dfe"
