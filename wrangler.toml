@@ -1,4 +1,5 @@
 name = "personal-website"
+main = "index.js"
 pages_build_output_dir = "."
 compatibility_date = "2025-01-01"
 
